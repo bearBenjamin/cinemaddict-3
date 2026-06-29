@@ -1,0 +1,59 @@
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
+
+const getRandomArrayElement = (array) => array[Math.floor(Math.random() * array.length)];
+
+const truncateDescription = (text, maxLength = 139) => {
+  if (text.length > maxLength) {
+    return `${text.slice(0, maxLength)}...`;
+  }
+  return text;
+};
+
+const humanizeReleaseYear = (date) => date ? dayjs(date).format('YYYY') : '';
+
+const humanizeReleaseDate = (date) => date ? dayjs(date).format('D MMMM YYYY') : '';
+
+const getRunTimeFilm = (runTime) => {
+  if (!runTime || runTime <= 0) {
+    return '';
+  }
+
+  const hours = Math.floor(runTime / 60);
+  const minutes = runTime % 60;
+
+  const hoursStr = hours > 0 ? `${hours}h` : '';
+  const minutesStr = minutes > 0 ? `${minutes}min` : '';
+
+  return [hoursStr, minutesStr].filter(Boolean).join(' ');
+};
+
+const getCurrentComments = (allComments, filmCommentIds) =>
+  filmCommentIds
+    .map((id) => allComments.find((comment) => comment.id === id))
+    .filter(Boolean); // Удалит undefined, если комментарий не найден
+
+const humanizeCommentDate = (date) => {
+  if (!date) {
+    return '';
+  }
+
+  const commentDate = dayjs(date);
+  const now = dayjs();
+
+  if (commentDate.isSame(now, 'day')) {
+    return 'Today';
+  }
+
+  const diffInDays = now.diff(commentDate, 'day');
+
+  if (diffInDays < 7) {
+    return commentDate.fromNow();
+  }
+
+  return commentDate.format('YYYY/MM/DD HH:mm');
+};
+
+export { getRandomArrayElement, truncateDescription, humanizeReleaseYear, humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate };

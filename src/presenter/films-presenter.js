@@ -8,9 +8,14 @@ import FilmCardView from '../view/film-card-view';
 import BtnShowMore from '../view/btn-show-more-view';
 import FilmsTopListView from '../view/films-top-container';
 import FilmsMostComentedListView from '../view/films-most-comented-container-view';
+import PopupView from '../view/popup-view';
+
+const FILM__EXTRA__COUNT = 2;
 
 export default class FilmsPresenter {
   #mainContainer = null;
+  #filmsModel = null;
+  #commentsModel = null;
   #filterComponent = new FiltersView();
   #sortComponent = new SortView();
   #filmsContainer = new FilmsContainerView();
@@ -21,25 +26,32 @@ export default class FilmsPresenter {
   #filmsMostComentedListContainer = new FilmsMostComentedListView();
   #filmsMostComentedContainer = new FilmsListContainerView();
 
-  constructor({mainContainer}) {
+  constructor({mainContainer, filmsModel, commentsModel}) {
     this.#mainContainer = mainContainer;
+    this.#filmsModel = filmsModel;
+    this.#commentsModel = commentsModel;
   }
 
   init() {
     render(this.#filterComponent, this.#mainContainer);
     render(this.#sortComponent, this.#mainContainer);
 
-    for (let i = 0; i < 5; i += 1) {
-      render(new FilmCardView(), this.#filmsListContainer.getElement());
+    const films = [...this.#filmsModel.getFilms()];
+    const comments = [...this.#commentsModel.getComments()];
+
+    for (let i = 0; i < films.length; i += 1) {
+      render(new FilmCardView({ film: films[i] }), this.#filmsListContainer.getElement());
     }
 
     render(this.#filmsListContainer, this.#filmsList.getElement());
     render(new BtnShowMore(), this.#filmsList.getElement());
     render(this.#filmsList, this.#filmsContainer.getElement());
 
-    for (let i = 0; i < 2; i += 1) {
-      render(new FilmCardView(), this.#filmsTopContainer.getElement());
-      render(new FilmCardView(), this.#filmsMostComentedContainer.getElement());
+    render(new PopupView({ film: films[0], comments: comments }), this.#mainContainer.parentElement);
+
+    for (let i = 0; i < FILM__EXTRA__COUNT; i += 1) {
+      render(new FilmCardView({ film: films[i] }), this.#filmsTopContainer.getElement());
+      render(new FilmCardView( {film: films[i] }), this.#filmsMostComentedContainer.getElement());
     }
 
     render(this.#filmsTopContainer, this.#filmsTopListContainer.getElement());
