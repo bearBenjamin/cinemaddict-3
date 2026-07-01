@@ -1,10 +1,18 @@
-import { createElement } from '../render';
-import { truncateDescription, humanizeReleaseYear, getRunTimeFilm } from '../utils';
+import AbstractView from '../framework/view/abstract-view';
+import {
+  truncateDescription,
+  humanizeReleaseYear,
+  getRunTimeFilm,
+} from '../utils/utils-film-card';
 
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
-  const watchlistClassName = isWatchlist ? 'film-card__controls-item--active' : '';
+  const watchlistClassName = isWatchlist
+    ? 'film-card__controls-item--active'
+    : '';
   const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
-  const favoriteClassName = isFavorite ? 'film-card__controls-item--active' : '';
+  const favoriteClassName = isFavorite
+    ? 'film-card__controls-item--active'
+    : '';
 
   return `
     <div class="film-card__controls">
@@ -17,7 +25,16 @@ const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
 
 const createTemplate = (film) => {
   const { comments, filmInfo } = film;
-  const { title, totalRating, poster, release, runTime, genre, description, userDetails } = filmInfo;
+  const {
+    title,
+    totalRating,
+    poster,
+    release,
+    runTime,
+    genre,
+    description,
+    userDetails,
+  } = filmInfo;
   const { watchlist, alreadyWatched, favorite } = userDetails;
 
   const shortDescription = truncateDescription(description);
@@ -42,25 +59,25 @@ const createTemplate = (film) => {
         </article>`;
 };
 
-export default class FilmCardView {
+export default class FilmCardView extends AbstractView {
   #film = null;
+  #handleCardClick = null;
 
-  constructor ({ film }) {
+  constructor({ film, onClickCard }) {
+    super();
     this.#film = film;
+    this.#handleCardClick = onClickCard;
+    this.element
+      .querySelector('.film-card__link')
+      .addEventListener('click', this.#cardClickHandler);
   }
 
-  getTemplate() {
+  get template() {
     return createTemplate(this.#film);
   }
 
-  getElement() {
-    if(!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #cardClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleCardClick();
+  };
 }

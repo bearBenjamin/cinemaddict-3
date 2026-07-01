@@ -5,7 +5,7 @@ export default class CommentsModel {
     this.#comments = comments;
   }
 
-  getComments() {
+  get comments() {
     return this.#comments;
   }
 }

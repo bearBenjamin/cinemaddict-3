@@ -1,11 +1,11 @@
-import { generateFilm } from '../mock/film';
+import { generateFilm } from '../mock/mock-film';
 
-const COUNT__FILM = 5;
+const COUNT__FILM = 22;
 
 export default class FilmModel {
-  films = Array.from({length: COUNT__FILM}, generateFilm);
+  #films = Array.from({length: COUNT__FILM}, generateFilm);
 
-  getFilms() {
-    return this.films;
+  get films() {
+    return this.#films;
   }
 }

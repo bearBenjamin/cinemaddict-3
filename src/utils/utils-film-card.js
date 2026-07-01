@@ -3,8 +3,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-const getRandomArrayElement = (array) => array[Math.floor(Math.random() * array.length)];
-
 const truncateDescription = (text, maxLength = 139) => {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
@@ -56,4 +54,11 @@ const humanizeCommentDate = (date) => {
   return commentDate.format('YYYY/MM/DD HH:mm');
 };
 
-export { getRandomArrayElement, truncateDescription, humanizeReleaseYear, humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate };
+const getWatchedCount = (films) => films.filter((film) => film.filmInfo.userDetails.alreadyWatched).length;
+
+const getUserStatus = (statusesConfigs, watchedCount) => {
+  const currentConfig = statusesConfigs.find((item) => watchedCount >= item.min && watchedCount <= item.max);
+  return currentConfig ? currentConfig.status : '';
+};
+
+export { truncateDescription, humanizeReleaseYear, humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate, getWatchedCount, getUserStatus };
