@@ -271,4 +271,18 @@ const comments = [
   }
 ];
 
-export { moviesData, comments };
+const USER_STATUS_CONFIGS = [
+  { status: 'Movie Buff', min: 21, max: Infinity },
+  { status: 'Fan', min: 11, max: 20},
+  { status: 'Novice', min: 1, max: 10},
+  { status: '', min: 0, max: 0}
+];
+
+const FilterType = {
+  ALL: 'all',
+  WATHLIST: 'watchlist',
+  HISTORY: 'alreadyWatched',
+  FAVORITE: 'favorite',
+};
+
+export { moviesData, comments, USER_STATUS_CONFIGS, FilterType };

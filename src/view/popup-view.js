@@ -1,12 +1,18 @@
-import { createElement } from '../render';
-import { humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate } from '../utils';
+import AbstractView from "../framework/view/abstract-view";
+import {
+  humanizeReleaseDate,
+  getRunTimeFilm,
+  getCurrentComments,
+  humanizeCommentDate,
+} from "../utils/utils-film-card";
 
 const createCommentsList = (data, comments) => {
   const currentComments = getCurrentComments(data, comments);
 
-  const listComments = currentComments.map((currentComment) => {
-    const dateComment = humanizeCommentDate(currentComment.date);
-    return `<li class="film-details__comment">
+  const listComments = currentComments
+    .map((currentComment) => {
+      const dateComment = humanizeCommentDate(currentComment.date);
+      return `<li class="film-details__comment">
             <span class="film-details__comment-emoji">
               <img src="./images/emoji/${currentComment.emotion}.png" width="55" height="55" alt="emoji-smile">
             </span>
@@ -19,15 +25,20 @@ const createCommentsList = (data, comments) => {
               </p>
             </div>
           </li>`;
-  }).join('');
+    })
+    .join("");
   return `<ul class="film-details__comments-list">
     ${listComments}</ul>`;
 };
 
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
-  const watchlistClassName = isWatchlist ? 'film-card__controls-item--active' : '';
-  const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
-  const favoriteClassName = isFavorite ? 'film-card__controls-item--active' : '';
+  const watchlistClassName = isWatchlist
+    ? "film-card__controls-item--active"
+    : "";
+  const watchedClassName = isWatched ? "film-card__controls-item--active" : "";
+  const favoriteClassName = isFavorite
+    ? "film-card__controls-item--active"
+    : "";
 
   return `
     <section class="film-details__controls">
@@ -41,19 +52,33 @@ const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
 const createListGenre = (genres) => {
   const genresTemplate = genres
     .map((genre) => `<span class="film-details__genre">${genre}</span>`)
-    .join(' ');
+    .join(" ");
 
   return `<td class="film-details__cell">${genresTemplate}</td>`;
 };
 
 const createTemplate = (film, commentsData) => {
   const { comments, filmInfo } = film;
-  const { title, alternativeTitle, totalRating, poster, ageRating, director, writers, actors, release, runTime, genre, description, userDetails } = filmInfo;
+  const {
+    title,
+    alternativeTitle,
+    totalRating,
+    poster,
+    ageRating,
+    director,
+    writers,
+    actors,
+    release,
+    runTime,
+    genre,
+    description,
+    userDetails,
+  } = filmInfo;
   const { watchlist, alreadyWatched, favorite } = userDetails;
 
   const releaseDate = humanizeReleaseDate(release.date);
   const time = getRunTimeFilm(runTime);
-  const genreStr = genre.length > 1 ? 'Genres' : 'Genre';
+  const genreStr = genre.length > 1 ? "Genres" : "Genre";
   const listCenres = createListGenre(genre);
   const btnList = createBtnControls(watchlist, alreadyWatched, favorite);
   const commentsList = createCommentsList(commentsData, comments);
@@ -90,11 +115,11 @@ const createTemplate = (film, commentsData) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writers.join(', ')}</td>
+              <td class="film-details__cell">${writers.join(", ")}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors.join(', ')}</td>
+              <td class="film-details__cell">${actors.join(", ")}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -163,27 +188,27 @@ const createTemplate = (film, commentsData) => {
 `;
 };
 
-export default class PopupView {
+export default class PopupView extends AbstractView {
   #film = null;
   #comments = null;
+  #handleBtnCloseClick = null;
 
-  constructor ({ film, comments }) {
+  constructor({ film, comments, onClickBtnClose }) {
+    super();
     this.#film = film;
     this.#comments = comments;
+    this.#handleBtnCloseClick = onClickBtnClose;
+    this.element
+      .querySelector(".film-details__close-btn")
+      .addEventListener("click", this.#btnCloseClickHandler);
   }
 
-  getTemplate() {
+  get template() {
     return createTemplate(this.#film, this.#comments);
   }
 
-  getElement() {
-    if(!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
+  #btnCloseClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleBtnCloseClick();
+  };
 }
