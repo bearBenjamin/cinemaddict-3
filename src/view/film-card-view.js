@@ -1,18 +1,18 @@
-import AbstractView from "../framework/view/abstract-view";
+import AbstractView from '../framework/view/abstract-view';
 import {
   truncateDescription,
   humanizeReleaseYear,
   getRunTimeFilm,
-} from "../utils/utils-film-card";
+} from '../utils/utils-film-card';
 
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
   const watchlistClassName = isWatchlist
-    ? "film-card__controls-item--active"
-    : "";
-  const watchedClassName = isWatched ? "film-card__controls-item--active" : "";
+    ? 'film-card__controls-item--active'
+    : '';
+  const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
   const favoriteClassName = isFavorite
-    ? "film-card__controls-item--active"
-    : "";
+    ? 'film-card__controls-item--active'
+    : '';
 
   return `
     <div class="film-card__controls">
@@ -68,8 +68,8 @@ export default class FilmCardView extends AbstractView {
     this.#film = film;
     this.#handleCardClick = onClickCard;
     this.element
-      .querySelector(".film-card__link")
-      .addEventListener("click", this.#cardClickHandler);
+      .querySelector('.film-card__link')
+      .addEventListener('click', this.#cardClickHandler);
   }
 
   get template() {

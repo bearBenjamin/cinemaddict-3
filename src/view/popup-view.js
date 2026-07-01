@@ -1,10 +1,10 @@
-import AbstractView from "../framework/view/abstract-view";
+import AbstractView from '../framework/view/abstract-view';
 import {
   humanizeReleaseDate,
   getRunTimeFilm,
   getCurrentComments,
   humanizeCommentDate,
-} from "../utils/utils-film-card";
+} from '../utils/utils-film-card';
 
 const createCommentsList = (data, comments) => {
   const currentComments = getCurrentComments(data, comments);
@@ -26,19 +26,19 @@ const createCommentsList = (data, comments) => {
             </div>
           </li>`;
     })
-    .join("");
+    .join('');
   return `<ul class="film-details__comments-list">
     ${listComments}</ul>`;
 };
 
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
   const watchlistClassName = isWatchlist
-    ? "film-card__controls-item--active"
-    : "";
-  const watchedClassName = isWatched ? "film-card__controls-item--active" : "";
+    ? 'film-card__controls-item--active'
+    : '';
+  const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
   const favoriteClassName = isFavorite
-    ? "film-card__controls-item--active"
-    : "";
+    ? 'film-card__controls-item--active'
+    : '';
 
   return `
     <section class="film-details__controls">
@@ -52,7 +52,7 @@ const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
 const createListGenre = (genres) => {
   const genresTemplate = genres
     .map((genre) => `<span class="film-details__genre">${genre}</span>`)
-    .join(" ");
+    .join(' ');
 
   return `<td class="film-details__cell">${genresTemplate}</td>`;
 };
@@ -78,7 +78,7 @@ const createTemplate = (film, commentsData) => {
 
   const releaseDate = humanizeReleaseDate(release.date);
   const time = getRunTimeFilm(runTime);
-  const genreStr = genre.length > 1 ? "Genres" : "Genre";
+  const genreStr = genre.length > 1 ? 'Genres' : 'Genre';
   const listCenres = createListGenre(genre);
   const btnList = createBtnControls(watchlist, alreadyWatched, favorite);
   const commentsList = createCommentsList(commentsData, comments);
@@ -115,11 +115,11 @@ const createTemplate = (film, commentsData) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${writers.join(", ")}</td>
+              <td class="film-details__cell">${writers.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${actors.join(", ")}</td>
+              <td class="film-details__cell">${actors.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -199,8 +199,8 @@ export default class PopupView extends AbstractView {
     this.#comments = comments;
     this.#handleBtnCloseClick = onClickBtnClose;
     this.element
-      .querySelector(".film-details__close-btn")
-      .addEventListener("click", this.#btnCloseClickHandler);
+      .querySelector('.film-details__close-btn')
+      .addEventListener('click', this.#btnCloseClickHandler);
   }
 
   get template() {
