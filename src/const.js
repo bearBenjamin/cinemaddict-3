@@ -271,6 +271,9 @@ const comments = [
   }
 ];
 
+const FILM__COUNT__PER__STEP = 5;
+const FILM__EXTRA__COUNT = 2;
+
 const USER_STATUS_CONFIGS = [
   { status: 'Movie Buff', min: 21, max: Infinity },
   { status: 'Fan', min: 11, max: 20},
@@ -285,4 +288,4 @@ const FilterType = {
   FAVORITE: 'favorite',
 };
 
-export { moviesData, comments, USER_STATUS_CONFIGS, FilterType };
+export { moviesData, comments, FILM__COUNT__PER__STEP, FILM__EXTRA__COUNT, USER_STATUS_CONFIGS, FilterType };
