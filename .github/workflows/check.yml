@@ -27,7 +27,6 @@
 #       run: |
 #         npm run lint
 
-
 on:
   push:
     branches:
@@ -35,11 +34,6 @@ on:
   pull_request:
     branches: '*'
   workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -52,12 +46,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2
 
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v4.2.0
       with:
-        node-version: '16'
+        node-version: '22' # Апдейт до вашей локальной версии Node.js
 
     - name: Install dependencies
       run: npm install
@@ -67,18 +61,23 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    # ВАЖНО: деплоим только при пуше в main или ручном запуске,
-    # чтобы пулл-реквесты не ломали деплой
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
-    needs: check # Сборка начнется только если линтер (check) прошел успешно
+    needs: check
+
+    # ФИКС: Прописываем права строго внутри самой работы build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.2.0
         with:
-          node-version: '16'
+          node-version: '22' # Апдейт до вашей локальной версии Node.js
 
       - name: Install dependencies
         run: |
@@ -89,13 +88,13 @@ jobs:
         run: npm run build
 
       - name: Setup pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v5.0.0
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
-          path: ./build
+          path: ./build # Убедитесь, что ваш сборщик создает именно папку build, а не dist
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
