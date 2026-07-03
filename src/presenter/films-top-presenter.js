@@ -9,17 +9,22 @@ export default class FilmsTopPresenter {
   #films = null;
   #comments = null;
   #onPopupOpen = null;
-
-  #renderedFilmExtraCount = FILM__EXTRA__COUNT;
+  #onDataChange = null;
 
   #filmsTopListContainer = new FilmsTopListView();
   #filmsTopContainer = new FilmsListContainerView();
 
-  constructor ({ filmsContainer, films, comments, onPopupOpen }) {
+  #renderedFilmExtraCount = FILM__EXTRA__COUNT;
+
+  #filmCardPresenters = new Map();
+
+  constructor ({ filmsContainer, films, comments, onPopupOpen, onDataChange }) {
     this.#filmsContainer = filmsContainer;
-    this.#films = films;
+    // this.#films = films;
+    this.#films = [...films].sort((filmA, filmB) => filmB.filmInfo.totalRating - filmA.filmInfo.totalRating);
     this.#comments = comments;
     this.#onPopupOpen = onPopupOpen;
+    this.#onDataChange = onDataChange;
   }
 
   init() {
@@ -36,12 +41,32 @@ export default class FilmsTopPresenter {
   }
 
   #renderExtraTopCard(film) {
+    if (this.#filmCardPresenters.has(film.id)) {
+      return;
+    }
+
     const filmCardPresenter = new FilmCardPresenter({
       listContainer: this.#filmsTopContainer,
       comments: this.#comments,
-      onPopupOpen: this.#onPopupOpen
+      onPopupOpen: this.#onPopupOpen,
+      onDataChange: this.#onDataChange,
     });
 
     filmCardPresenter.init({ film });
+
+    this.#filmCardPresenters.set(film.id, filmCardPresenter);
+  }
+
+  #clearTopFilmList() {
+    this.#filmCardPresenters.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenters.clear();
+  }
+
+  updatedFilmCard(updatedFilm) {
+    const targetPresenter = this.#filmCardPresenters.get(updatedFilm.id);
+
+    if (targetPresenter) {
+      targetPresenter.init({ film: updatedFilm });
+    }
   }
 }

@@ -7,27 +7,31 @@ import { FILM__COUNT__PER__STEP } from '../const';
 
 export default class FilmsPresenter {
   #filmsContainer = null;
-  #filmsModel = null;
-  #commentsModel = null;
-  #onPopupOpen = null;
-
-  #filmsList = new FilmsListView();
-  #filmsListContainer = new FilmsListContainerView();
-
   #films = null;
   #comments = null;
   #filters = null;
   #btnShowMore = null;
-  #popupCardFilm = null;
+  #onPopupOpen = null;
+  #onDataChange = null;
+
+  #filmsList = new FilmsListView();
+  #filmsListContainer = new FilmsListContainerView();
+
+  // #filmsModel = null;
+  // #commentsModel = null;
+  // #popupCardFilm = null;
 
   #renderedFilmCount = FILM__COUNT__PER__STEP;
 
-  constructor({ filmsContainer, films, comments, filters, onPopupOpen }) {
+  #filmCardPresenters = new Map();
+
+  constructor({ filmsContainer, films, comments, filters, onPopupOpen, onDataChange }) {
     this.#filmsContainer = filmsContainer;
     this.#films = films;
     this.#comments = comments;
     this.#filters = filters;
     this.#onPopupOpen = onPopupOpen;
+    this.#onDataChange = onDataChange;
   }
 
   init() {
@@ -51,13 +55,36 @@ export default class FilmsPresenter {
   }
 
   #renderCard({ film }) {
+    if (this.#filmCardPresenters.has(film.id)) {
+      return;
+    }
+
     const filmCardPresenter = new FilmCardPresenter({
       listContainer: this.#filmsListContainer,
       comments: this.#comments,
-      onPopupOpen: this.#onPopupOpen
+      onPopupOpen: this.#onPopupOpen,
+      onDataChange: this.#onDataChange,
     });
 
     filmCardPresenter.init({ film });
+
+    this.#filmCardPresenters.set(film.id, filmCardPresenter);
+  }
+
+  #clearFilmList() {
+    this.#filmCardPresenters.forEach((presenter) => presenter.destroy());
+    this.#filmCardPresenters.clear();
+
+    this.#renderedFilmCount = FILM__COUNT__PER__STEP;
+    remove(this.#btnShowMore);
+  }
+
+  updatedFilmCard(updatedFilm) {
+    const targetPresenter = this.#filmCardPresenters.get(updatedFilm.id);
+
+    if (targetPresenter) {
+      targetPresenter.init({ film: updatedFilm });
+    }
   }
 
   #handleBtnShowMoreClick = () => {

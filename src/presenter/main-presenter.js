@@ -7,12 +7,17 @@ import FilmsContainerView from '../view/films-container-view';
 import NoFilmsListView from '../view/no-films-list.view';
 import { render } from '../framework/render';
 import { generateFilter } from '../mock/mock-filter';
+import { updateCard } from '../utils/common';
 
 export default class MainPresenter {
   #mainContainer = null;
   #filmsModel = null;
   #commentsModel = null;
   #currentPopupPresenter = null;
+
+  #filmsPresenter = null;
+  #filmsTopPresenter = null;
+  #filmsMostPresenter = null;
 
   #filmsContainer = new FilmsContainerView();
   #sortComponent = new SortView();
@@ -32,26 +37,29 @@ export default class MainPresenter {
     this.#comments = [...this.#commentsModel.comments];
     this.#filters = generateFilter(this.#films);
 
-    const filmsPresenter = new FilmsPresenter ({
+    this.#filmsPresenter = new FilmsPresenter ({
       filmsContainer: this.#filmsContainer,
       films: this.#films,
       comments: this.#comments,
       filters: this.#filters,
-      onPopupOpen: this.#handlePopupOpen
+      onPopupOpen: this.#handlePopupOpen,
+      onDataChange: this.#handleFilmChange,
     });
 
-    const filmsTopPresenter = new FilmsTopPresenter({
+    this.#filmsTopPresenter = new FilmsTopPresenter({
       filmsContainer: this.#filmsContainer,
       films: this.#films,
       comments: this.#comments,
-      onPopupOpen: this.#handlePopupOpen
+      onPopupOpen: this.#handlePopupOpen,
+      onDataChange: this.#handleFilmChange,
     });
 
-    const filmsMostPresenter = new FilmsMostPresenter({
+    this.#filmsMostPresenter = new FilmsMostPresenter({
       filmsContainer: this.#filmsContainer,
       films: this.#films,
       comments: this.#comments,
-      onPopupOpen: this.#handlePopupOpen
+      onPopupOpen: this.#handlePopupOpen,
+      onDataChange: this.#handleFilmChange,
     });
 
     render(new FiltersView({ filters: this.#filters }), this.#mainContainer);
@@ -65,10 +73,9 @@ export default class MainPresenter {
     render(this.#sortComponent, this.#mainContainer);
     render(this.#filmsContainer, this.#mainContainer);
 
-
-    filmsPresenter.init();
-    filmsTopPresenter.init();
-    filmsMostPresenter.init();
+    this.#filmsPresenter.init();
+    this.#filmsTopPresenter.init();
+    this.#filmsMostPresenter.init();
   }
 
   #handlePopupOpen = (newPopupPresenter) => {
@@ -76,5 +83,21 @@ export default class MainPresenter {
       this.#currentPopupPresenter.closePopup();
     }
     this.#currentPopupPresenter = newPopupPresenter;
+  };
+
+  #handleFilmChange = (updateFilm) => {
+    this.#films = updateCard(this.#films, updateFilm);
+
+    if (this.#filmsPresenter) {
+      this.#filmsPresenter.updatedFilmCard(updateFilm);
+    }
+
+    if (this.#filmsTopPresenter) {
+      this.#filmsTopPresenter.updatedFilmCard(updateFilm);
+    }
+
+    if (this.#filmsMostPresenter) {
+      this.#filmsMostPresenter.updatedFilmCard(updateFilm);
+    }
   };
 }
