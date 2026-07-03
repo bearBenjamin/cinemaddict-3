@@ -6,7 +6,7 @@ const moviesData = [
       title: 'Made for Each Other',
       alternativeTitle: 'Созданы друг для друга',
       totalRating: 5,
-      poster: 'images/posters/made-for-each-other.png',
+      poster: './images/posters/made-for-each-other.png',
       ageRating: 13,
       director: 'John Cromwell',
       writers: ['Jo Swerling', 'Rose Franken'],
@@ -60,7 +60,7 @@ const moviesData = [
       title: 'Sagebrush Trail',
       alternativeTitle: 'Тропа полыни',
       totalRating: 2.5,
-      poster: 'images/posters/sagebrush-trail.jpg',
+      poster: './images/posters/sagebrush-trail.jpg',
       ageRating: 13,
       director: 'Armand Schaefer',
       writers: ['Lindsley Parsons'],
@@ -87,7 +87,7 @@ const moviesData = [
       title: 'Santa Claus Conquers the Martians',
       alternativeTitle: 'Санта Клаус завоевывает марсиан',
       totalRating: 7.2,
-      poster: 'images/posters/santa-claus-conquers-the-martians.jpg',
+      poster: './images/posters/santa-claus-conquers-the-martians.jpg',
       ageRating: 0,
       director: 'Nicholas Webster',
       writers: ['Glenville Mareth', 'Paul L. Jacobson'],
@@ -114,7 +114,7 @@ const moviesData = [
       title: 'The Dance of Life',
       alternativeTitle: 'Танец жизни',
       totalRating: 5,
-      poster: 'images/posters/the-dance-of-life.jpg',
+      poster: './images/posters/the-dance-of-life.jpg',
       ageRating: 13,
       director: 'John Cromwell',
       writers: ['Benjamin Glazer', 'Arthur Hopkins', 'George Manker Watters'],
@@ -141,7 +141,7 @@ const moviesData = [
       title: 'The Man with the Golden Arm',
       alternativeTitle: 'Человек с золотой рукой',
       totalRating: 8.7,
-      poster: 'images/posters/the-man-with-the-golden-arm.jpg',
+      poster: './images/posters/the-man-with-the-golden-arm.jpg',
       ageRating: 16,
       director: 'Otto Preminger',
       writers: ['Walter Newman', 'Lewis Meltzer', 'Ben Hecht', 'Nelson Algren'],
@@ -271,6 +271,9 @@ const comments = [
   }
 ];
 
+const FILM__COUNT__PER__STEP = 5;
+const FILM__EXTRA__COUNT = 2;
+
 const USER_STATUS_CONFIGS = [
   { status: 'Movie Buff', min: 21, max: Infinity },
   { status: 'Fan', min: 11, max: 20},
@@ -285,4 +288,4 @@ const FilterType = {
   FAVORITE: 'favorite',
 };
 
-export { moviesData, comments, USER_STATUS_CONFIGS, FilterType };
+export { moviesData, comments, FILM__COUNT__PER__STEP, FILM__EXTRA__COUNT, USER_STATUS_CONFIGS, FilterType };

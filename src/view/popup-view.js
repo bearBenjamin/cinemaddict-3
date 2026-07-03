@@ -32,21 +32,15 @@ const createCommentsList = (data, comments) => {
 };
 
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
-  const watchlistClassName = isWatchlist
-    ? 'film-card__controls-item--active'
-    : '';
-  const watchedClassName = isWatched ? 'film-card__controls-item--active' : '';
-  const favoriteClassName = isFavorite
-    ? 'film-card__controls-item--active'
-    : '';
+  const watchlistClassName = isWatchlist ? 'film-details__control-button--active' : '';
+  const watchedClassName = isWatched ? 'film-details__control-button--active' : '';
+  const favoriteClassName = isFavorite ? 'film-details__control-button--active' : '';
 
-  return `
-    <section class="film-details__controls">
-      <button class="film-card__controls-item film-card__controls-item--add-to-watchlist ${watchlistClassName}" type="button">Add to watchlist</button>
-      <button class="film-card__controls-item film-card__controls-item--mark-as-watched ${watchedClassName}" type="button">Mark as watched</button>
-      <button class="film-card__controls-item film-card__controls-item--favorite ${favoriteClassName}" type="button">Mark as favorite</button>
-    </section>
-  `;
+  return `<section class="film-details__controls">
+        <button type="button" class="film-details__control-button film-details__control-button--watchlist ${watchlistClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
+        <button type="button" class="film-details__control-button film-details__control-button--watched ${watchedClassName}" id="watched" name="watched">Already watched</button>
+        <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
+      </section>`;
 };
 
 const createListGenre = (genres) => {
@@ -192,8 +186,11 @@ export default class PopupView extends AbstractView {
   #film = null;
   #comments = null;
   #handleBtnCloseClick = null;
+  #handleWatchListBtnClick = null;
+  #handleWatchedBtnClick = null;
+  #handleFavoriteBtnClick = null;
 
-  constructor({ film, comments, onClickBtnClose }) {
+  constructor({ film, comments, onClickBtnClose, onClickWatchlistBtnCard, onClickWatchedBtnCard, onClickFavoriteBtnCard }) {
     super();
     this.#film = film;
     this.#comments = comments;
@@ -201,6 +198,21 @@ export default class PopupView extends AbstractView {
     this.element
       .querySelector('.film-details__close-btn')
       .addEventListener('click', this.#btnCloseClickHandler);
+
+    this.#handleWatchListBtnClick = onClickWatchlistBtnCard;
+    this.element
+      .querySelector('.film-details__control-button--watchlist')
+      .addEventListener('click', this.#btnWatchlistClickHandler);
+
+    this.#handleWatchedBtnClick = onClickWatchedBtnCard;
+    this.element
+      .querySelector('.film-details__control-button--watched')
+      .addEventListener('click', this.#btnWatchedClickHandler);
+
+    this.#handleFavoriteBtnClick = onClickFavoriteBtnCard;
+    this.element
+      .querySelector('.film-details__control-button--favorite')
+      .addEventListener('click', this.#btnFavoriteClickHandler);
   }
 
   get template() {
@@ -210,5 +222,20 @@ export default class PopupView extends AbstractView {
   #btnCloseClickHandler = (evt) => {
     evt.preventDefault();
     this.#handleBtnCloseClick();
+  };
+
+  #btnWatchlistClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleWatchListBtnClick();
+  };
+
+  #btnWatchedClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleWatchedBtnClick();
+  };
+
+  #btnFavoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleFavoriteBtnClick();
   };
 }
