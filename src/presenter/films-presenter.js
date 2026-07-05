@@ -34,13 +34,21 @@ export default class FilmsPresenter {
     this.#onDataChange = onDataChange;
   }
 
-  init() {
+  init(sortFilms) {
+    if (sortFilms) {
+      this.#films = sortFilms; // Запоминаем новый порядок фильмов
+    }
+
     this.#renderListFilm();
   }
 
   #renderListFilm() {
-    render(this.#filmsListContainer, this.#filmsList.element);
-    render(this.#filmsList, this.#filmsContainer.element);
+    if (!this.#filmsContainer.element.contains(this.#filmsList.element)) {
+      render(this.#filmsListContainer, this.#filmsList.element);
+      render(this.#filmsList, this.#filmsContainer.element);
+    }
+    // render(this.#filmsListContainer, this.#filmsList.element);
+    // render(this.#filmsList, this.#filmsContainer.element);
 
     for (let i = 0; i < Math.min(this.#films.length, FILM__COUNT__PER__STEP); i += 1) {
       this.#renderCard({ film: this.#films[i] });
@@ -71,7 +79,7 @@ export default class FilmsPresenter {
     this.#filmCardPresenters.set(film.id, filmCardPresenter);
   }
 
-  #clearFilmList() {
+  clearFilmList() {
     this.#filmCardPresenters.forEach((presenter) => presenter.destroy());
     this.#filmCardPresenters.clear();
 

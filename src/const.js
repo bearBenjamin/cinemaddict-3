@@ -288,4 +288,10 @@ const FilterType = {
   FAVORITE: 'favorite',
 };
 
-export { moviesData, comments, FILM__COUNT__PER__STEP, FILM__EXTRA__COUNT, USER_STATUS_CONFIGS, FilterType };
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating'
+};
+
+export { moviesData, comments, FILM__COUNT__PER__STEP, FILM__EXTRA__COUNT, USER_STATUS_CONFIGS, FilterType, SortType };

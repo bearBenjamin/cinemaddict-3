@@ -61,4 +61,13 @@ const getUserStatus = (statusesConfigs, watchedCount) => {
   return currentConfig ? currentConfig.status : '';
 };
 
-export { truncateDescription, humanizeReleaseYear, humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate, getWatchedCount, getUserStatus };
+const sortFilmsByDate = (films) => [...films].sort((filmA, filmB) => {
+  const dateA = dayjs(filmA.filmInfo.release.date);
+  const dateB = dayjs(filmB.filmInfo.release.date);
+
+  return dateB.diff(dateA);
+});
+
+const sortFilmsByRating = (films) => [...films].sort((filmA, filmB) => filmB.filmInfo.totalRating - filmA.filmInfo.totalRating);
+
+export { truncateDescription, humanizeReleaseYear, humanizeReleaseDate, getRunTimeFilm, getCurrentComments, humanizeCommentDate, getWatchedCount, getUserStatus, sortFilmsByDate, sortFilmsByRating  };

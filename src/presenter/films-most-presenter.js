@@ -57,7 +57,7 @@ export default class FilmsMostPresenter {
     this.#filmCardPresenters.set(film.id, filmCardPresenter);
   }
 
-  #clearMostFilmList() {
+  clearFilmList() {
     this.#filmCardPresenters.forEach((presenter) => presenter.destroy());
     this.#filmCardPresenters.clear();
   }
