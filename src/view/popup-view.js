@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {
   humanizeReleaseDate,
   getRunTimeFilm,
@@ -31,6 +31,13 @@ const createCommentsList = (data, comments) => {
     ${listComments}</ul>`;
 };
 
+const createUserEmotion = (userEmotion) => {
+  if (!userEmotion) {
+    return '';
+  }
+  return `<img src="./images/emoji/${userEmotion}.png" width="55" height="55" alt="emoji-${userEmotion}">`;
+};
+
 const createBtnControls = (isWatchlist, isWatched, isFavorite) => {
   const watchlistClassName = isWatchlist ? 'film-details__control-button--active' : '';
   const watchedClassName = isWatched ? 'film-details__control-button--active' : '';
@@ -51,8 +58,8 @@ const createListGenre = (genres) => {
   return `<td class="film-details__cell">${genresTemplate}</td>`;
 };
 
-const createTemplate = (film, commentsData) => {
-  const { comments, filmInfo } = film;
+const createTemplate = (state) => {
+  const { comments, filmInfo, commentsData, userEmotion = '', commentText = '' } = state;
   const {
     title,
     alternativeTitle,
@@ -76,6 +83,7 @@ const createTemplate = (film, commentsData) => {
   const listCenres = createListGenre(genre);
   const btnList = createBtnControls(watchlist, alreadyWatched, favorite);
   const commentsList = createCommentsList(commentsData, comments);
+  const userEmodzi = createUserEmotion(userEmotion);
 
   return `<section class="film-details">
   <form class="film-details__inner" action="" method="get">
@@ -147,29 +155,29 @@ const createTemplate = (film, commentsData) => {
         ${commentsList}
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label"></div>
+          <div class="film-details__add-emoji-label">${userEmodzi}</div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${userEmotion === 'smile' ? 'checked' : ''}>
             <label class="film-details__emoji-label" for="emoji-smile">
               <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping" ${userEmotion === 'sleeping' ? 'checked' : ''}>
             <label class="film-details__emoji-label" for="emoji-sleeping">
               <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke" ${userEmotion === 'puke' ? 'checked' : ''}>
             <label class="film-details__emoji-label" for="emoji-puke">
               <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
             </label>
 
-            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+            <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry" ${userEmotion === 'angry' ? 'checked' : ''}>
             <label class="film-details__emoji-label" for="emoji-angry">
               <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
             </label>
@@ -182,42 +190,66 @@ const createTemplate = (film, commentsData) => {
 `;
 };
 
-export default class PopupView extends AbstractView {
-  #film = null;
-  #comments = null;
+export default class PopupView extends AbstractStatefulView {
   #handleBtnCloseClick = null;
   #handleWatchListBtnClick = null;
   #handleWatchedBtnClick = null;
   #handleFavoriteBtnClick = null;
 
-  constructor({ film, comments, onClickBtnClose, onClickWatchlistBtnCard, onClickWatchedBtnCard, onClickFavoriteBtnCard }) {
+  #updateViewData = null;
+
+  constructor({ film, comments, viewData, updateViewData, onClickBtnClose, onClickWatchlistBtnCard, onClickWatchedBtnCard, onClickFavoriteBtnCard }) {
     super();
-    this.#film = film;
-    this.#comments = comments;
+    this._setState(PopupView.parseFilmToState(film, comments, viewData.emotion, viewData.comment, viewData.scrollPosition));
+    this.#updateViewData = updateViewData;
     this.#handleBtnCloseClick = onClickBtnClose;
-    this.element
-      .querySelector('.film-details__close-btn')
-      .addEventListener('click', this.#btnCloseClickHandler);
-
     this.#handleWatchListBtnClick = onClickWatchlistBtnCard;
-    this.element
-      .querySelector('.film-details__control-button--watchlist')
-      .addEventListener('click', this.#btnWatchlistClickHandler);
-
     this.#handleWatchedBtnClick = onClickWatchedBtnCard;
-    this.element
-      .querySelector('.film-details__control-button--watched')
-      .addEventListener('click', this.#btnWatchedClickHandler);
-
     this.#handleFavoriteBtnClick = onClickFavoriteBtnCard;
-    this.element
-      .querySelector('.film-details__control-button--favorite')
-      .addEventListener('click', this.#btnFavoriteClickHandler);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createTemplate(this.#film, this.#comments);
+    return createTemplate(this._state);
   }
+
+  _restoreHandlers = () => {
+    this.saveScrollPosition();
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#btnCloseClickHandler);
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#btnWatchlistClickHandler);
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#btnWatchedClickHandler);
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#btnFavoriteClickHandler);
+
+    this.element.querySelector('.film-details__emoji-list').addEventListener('change', this.#emotionChangeHandler);
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#commentInputChangeHandler);
+  };
+
+  saveScrollPosition = () => {
+    this.element.scrollTop = this._state.scrollPosition;
+  };
+
+  #localUpdateViewData = () => {
+    this.#updateViewData({
+      emotion: this._state.userEmotion,
+      comment: this._state.commentText,
+      scrollPosition: this.element.scrollTop
+    });
+  };
+
+  #emotionChangeHandler = (evt) => {
+    evt.preventDefault();
+    this.updateElement({
+      userEmotion: evt.target.value,
+      scrollPosition: this.element.scrollTop
+    });
+  };
+
+  #commentInputChangeHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      commentText: evt.target.value
+    });
+  };
 
   #btnCloseClickHandler = (evt) => {
     evt.preventDefault();
@@ -226,16 +258,36 @@ export default class PopupView extends AbstractView {
 
   #btnWatchlistClickHandler = (evt) => {
     evt.preventDefault();
+    this.#localUpdateViewData();
     this.#handleWatchListBtnClick();
   };
 
   #btnWatchedClickHandler = (evt) => {
     evt.preventDefault();
+    this.#localUpdateViewData();
     this.#handleWatchedBtnClick();
   };
 
   #btnFavoriteClickHandler = (evt) => {
     evt.preventDefault();
+    this.#localUpdateViewData();
     this.#handleFavoriteBtnClick();
   };
+
+  static parseFilmToState = (film, comments, userEmotion = null, commentText = null, scrollPosition = 0) => ({
+    ...film,
+    commentsData: comments,
+    userEmotion,
+    commentText: commentText || film.commentText || '',
+    scrollPosition
+  });
+
+  static parseStateToFilm(state) {
+    const film = {...state};
+    delete film.commentsData;
+    delete film.userEmotion;
+    delete film.commentText;
+    delete film.scrollPosition;
+    return film;
+  }
 }

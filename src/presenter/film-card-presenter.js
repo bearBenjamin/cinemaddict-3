@@ -13,6 +13,12 @@ export default class FilmCardPresenter {
   #onPopupOpen = null;
   #onDataChange = null;
 
+  #popupViewData = {
+    emotion: null,
+    comment: null,
+    scrollPosition: 0
+  };
+
   constructor ({ listContainer, comments, onPopupOpen, onDataChange }) {
     this.#listContainer = listContainer;
     this.#comments = comments;
@@ -24,6 +30,7 @@ export default class FilmCardPresenter {
     this.#film = film;
 
     const prevCardFilmComponent = this.#cardFilmComponent;
+    const prevPopupComponent = this.#popupFilm;
 
     this.#cardFilmComponent = new FilmCardView({
       film: this.#film,
@@ -44,13 +51,13 @@ export default class FilmCardPresenter {
       replace(this.#cardFilmComponent, prevCardFilmComponent);
     }
 
-    const prevPopupComponent = this.#popupFilm;
-
     if (prevPopupComponent !== null) {
 
       this.#popupFilm = new PopupView({
         film: this.#film,
         comments: this.#comments,
+        viewData: this.#popupViewData,
+        updateViewData: this.#updatePopupViewData,
         onClickBtnClose: () => this.closePopup(),
         onClickWatchlistBtnCard: this.#handleWatchListBtnClick,
         onClickWatchedBtnCard: this.#handleWatchedBtnClick,
@@ -58,11 +65,20 @@ export default class FilmCardPresenter {
       });
 
       replace(this.#popupFilm, prevPopupComponent);
+      this.#popupFilm.saveScrollPosition();
       remove(prevPopupComponent);
     }
 
+    // if (prevPopupComponent !== null) {
+    //   this.#popupFilm.updateControls(this.#film.filmInfo.userDetails);
+    // }
+
     remove(prevCardFilmComponent);
   }
+
+  #updatePopupViewData = (viewData) => {
+    this.#popupViewData = {...viewData};
+  };
 
   destroy() {
     remove(this.#cardFilmComponent);
@@ -79,6 +95,8 @@ export default class FilmCardPresenter {
 
     remove(this.#popupFilm);
     this.#popupFilm = null;
+
+    this.#popupViewData = { emotion: null, comment: null, scrollPosition: 0 };
 
     document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#escKeyDownHandler);
@@ -101,6 +119,8 @@ export default class FilmCardPresenter {
     this.#popupFilm = new PopupView({
       film,
       comments: this.#comments,
+      viewData: this.#popupViewData,
+      updateViewData: this.#updatePopupViewData,
       onClickBtnClose: () => {
         this.closePopup();
       },
@@ -110,19 +130,23 @@ export default class FilmCardPresenter {
     });
 
     render(this.#popupFilm, document.body);
+    this.#popupFilm.saveScrollPosition();
+
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#escKeyDownHandler);
   };
 
   #handleWatchListBtnClick = () => {
+    const updatedUserDetails = {
+      ...this.#film.filmInfo.userDetails,
+      watchlist: !this.#film.filmInfo.userDetails.watchlist
+    };
+
     this.#onDataChange({
       ...this.#film,
       filmInfo: {
         ...this.#film.filmInfo,
-        userDetails: {
-          ...this.#film.filmInfo.userDetails,
-          watchlist: !this.#film.filmInfo.userDetails.watchlist
-        }
+        userDetails: updatedUserDetails
       }
     });
   };
@@ -134,7 +158,7 @@ export default class FilmCardPresenter {
         ...this.#film.filmInfo,
         userDetails: {
           ...this.#film.filmInfo.userDetails,
-          alreadyWatched: !this.#film.filmInfo.userDetails.alreadyWatched // <-- Исправлена опечатка в имени флага
+          alreadyWatched: !this.#film.filmInfo.userDetails.alreadyWatched
         }
       }
     });
